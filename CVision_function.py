@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
 
-def get_contours_and_vals(image):
+def get_contours_and_vals(path: str):
+    image = cv2.imread(path)
+
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     lower_blue = np.array([100, 150, 0])
@@ -16,4 +18,3 @@ def get_contours_and_vals(image):
 
     return output_image, count_of_contours
 
-image = cv2.imread('template_in_0.jpg')

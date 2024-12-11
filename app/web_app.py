@@ -36,25 +36,25 @@ async def main(page: ft.Page):
 
     snack_bar_error = ft.SnackBar(
         ft.Row(
-            [ft.Text("Некорректные данные", color=ft.colors.RED_500, size=20)],
+            [ft.Text("Некорректные данные", color=ft.Colors.RED_500, size=20)],
             alignment=ft.MainAxisAlignment.CENTER
         ),
-        bgcolor=ft.colors.GREY_900,
+        bgcolor=ft.Colors.GREY_900,
     )
 
     snack_bar_success = ft.SnackBar(
         ft.Row(
-            [ft.Text("Конвертация успешна!", color=ft.colors.GREEN_500, size=20)],
+            [ft.Text("Конвертация успешна!", color=ft.Colors.GREEN_500, size=20)],
             alignment=ft.MainAxisAlignment.CENTER
         ),
-        bgcolor=ft.colors.GREY_900,
+        bgcolor=ft.Colors.GREY_900,
     )
 
     page.overlay.append(pick_files_dialog)
 
     upload_btn = ft.ElevatedButton(
-        "Загрузите файл", icon=ft.icons.UPLOAD_FILE,
-        on_click=lambda _: pick_files_dialog.pick_files(allow_multiple=True),
+        "Загрузите файл", icon=ft.Icons.UPLOAD_FILE,
+        on_click=lambda _: pick_files_dialog.pick_files(allow_multiple=True, allowed_extensions=['jpg']),
         width=500
     )
 
@@ -71,28 +71,33 @@ async def main(page: ft.Page):
         if hasattr(page, 'selected_images'):
             for file in page.selected_images:
                 path = file.path
-                img, values = get_contours_and_vals(str(path))
-                save_path = os.path.join(SAVE_DIRECTORY, f"{file.name}")
-                cv2.imwrite(save_path, img)
-                write_csv(file.name, values)
+                try:
+                    img, values = get_contours_and_vals(str(path))
+                    save_path = os.path.join(SAVE_DIRECTORY, f"{file.name}")
+                    cv2.imwrite(save_path, img)
+                    write_csv(file.name, values)
+                except:
+                    page.open(snack_bar_error)
+                    btn_container.controls.clear()
+                    page.update()
+                finally:
+                    open_btn = ft.ElevatedButton(
+                        text=f"Открыть {file.name}",
+                        icon=ft.Icons.DOWNLOAD,
+                        on_click=lambda e, path=save_path: get_img(path)
+                    )
 
-                open_btn = ft.ElevatedButton(
-                    text=f"Открыть {file.name}",
-                    icon=ft.icons.OPEN_IN_NEW,
-                    on_click=lambda e, path=save_path: get_img(path)
-                )
-
-                file_btn = ft.ElevatedButton(
-                    text=f"Открыть data.csv",
-                    icon=ft.icons.OPEN_IN_NEW,
-                    on_click=lambda e: os.startfile('data.csv')
-                )
-                btn_container.controls.clear()
-                if len(btn_container.controls) <= 1:
-                    btn_container.controls.append(open_btn)
-                    btn_container.controls.append(file_btn)
-            page.open(snack_bar_success)
-            page.update()
+                    file_btn = ft.ElevatedButton(
+                        text=f"Открыть data.csv",
+                        icon=ft.Icons.DOWNLOAD,
+                        on_click=lambda e: os.startfile('data.csv')
+                    )
+                    btn_container.controls.clear()
+                    if len(btn_container.controls) <= 1:
+                        btn_container.controls.append(open_btn)
+                        btn_container.controls.append(file_btn)
+                page.open(snack_bar_success)
+                page.update()
 
     reg_btn = ft.ElevatedButton(text='Конвертировать', disabled=True, on_click=convert_images)
     btn_container = ft.Column(spacing=10)
@@ -100,7 +105,7 @@ async def main(page: ft.Page):
     main_page = ft.Container(
         content=ft.Column(
             [
-                ft.Text('Подготовка фотошаблона', size=50, color=ft.colors.CYAN_400),
+                ft.Text('Подготовка фотошаблона', size=50, color=ft.Colors.CYAN_400),
                 upload_btn, selected_files,
                 reg_btn,
                 btn_container

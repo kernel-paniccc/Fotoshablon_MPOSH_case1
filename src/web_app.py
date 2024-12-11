@@ -4,7 +4,7 @@ import flet as ft
 from PIL import Image
 import os
 from flet import Theme
-from CVision_function import get_contours_and_vals
+from src.CVision_function import get_contours_and_vals
 import cv2
 
 SAVE_DIRECTORY = "converted_images/"

@@ -63,12 +63,9 @@ async def main(page: ft.Page):
         im.show()
 
     def write_csv(file_name, count_objects):
-        with open('data.csv', 'a') as file:
+        with open('data.csv', 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(
-                [file_name, count_objects]
-            )
-
+            writer.writerow([file_name, count_objects])
 
     def convert_images(e):
         if hasattr(page, 'selected_images'):
@@ -90,6 +87,7 @@ async def main(page: ft.Page):
                     icon=ft.icons.OPEN_IN_NEW,
                     on_click=lambda e: os.startfile('data.csv')
                 )
+                btn_container.controls.clear()
                 if len(btn_container.controls) <= 1:
                     btn_container.controls.append(open_btn)
                     btn_container.controls.append(file_btn)
